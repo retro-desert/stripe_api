@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <title>Stripe - Item</title>
+    <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
+</head>
+
+<body>
+    <div class="jumbo mt-4 p-5 rounded text-info">
+        <div class="alert alert-info">
+
+            <h4 class="text-center my-3 alert-heading"><strong>{{ name }}</strong></h4>
+            <p><b>Price:</b> {{ price }} EUR</p>
+            <p><b>Description:</b> {{ description }}</p>
+
+            <button class="btn btn-lg btn-outline-info" type="submit" id="button-buy">Buy</button>
+
+            {% if message %}
+                {% if message.0 == "True" %}
+                    <div class="alert alert-success text-center" role="alert">
+                        {{ message.1 }}
+                    </div>
+                {% elif message.0 == "False" %}
+                    <div class="alert alert-danger text-center" role="alert">
+                        {{ message.1 }}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+        </div>
+    </div>
+
+</body>
+</html>
+
+<script src="{% static 'jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'bootstrap.bundle.min.js' %}"></script>
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+    const stripe = Stripe("{{ apiKey }}");
+    const buyButton = document.getElementById("button-buy");
+
+    buyButton.addEventListener('click', function() {
+        // Create a new Checkout Session using the server-side endpoint
+        // Redirect to Stripe Session Checkout
+        fetch('/buy/{{ pk }}', {method: 'GET'})
+        .then(response => {
+            return response.json()
+        })
+        .then(data => stripe.redirectToCheckout({ sessionId: data.session_id }))
+      });
+</script>
